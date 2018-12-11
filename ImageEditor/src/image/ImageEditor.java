@@ -17,8 +17,8 @@ public class ImageEditor {
 		BufferedImage newImg = ImageEditor.reduceSize(img,img.getWidth()/200);
 
 		/*for(int i = 0; i < 255; i++) { 
-			BufferedImage newImg2 = ImageTest.contrast(newImg, i);
-			ImageTest.saveImage(newImg2, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\img"+i+".png");
+			BufferedImage newImg2 = ImageEditor.contrast(newImg, i);
+			ImageEditor.saveImage(newImg2, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\img"+i+".png");
 		}*/
 		
 		newImg = ImageEditor.contrast(newImg, 40);

@@ -34,8 +34,8 @@ public class Listeners extends JPanel implements MouseMotionListener{
 		addMouseMotionListener(this);
 		String path = "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\g.jpg";
 		
-		this.img = ImageIO.read(new File(path));
-		this.img_changed = ImageIO.read(new File(path));
+		this.img = ImageEditor.reduceSize(ImageIO.read(new File(path)), 1);
+		this.img_changed = ImageEditor.reduceSize(ImageIO.read(new File(path)), 1);
 		
 		this.rmin = 256;
 		this.rmax = -1;
