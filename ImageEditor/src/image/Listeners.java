@@ -1,6 +1,8 @@
 package image;
 
 import java.awt.Graphics;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -11,7 +13,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-public class Listeners extends JPanel implements MouseMotionListener{
+public class Listeners extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
 	private BufferedImage img;
 	private BufferedImage img_changed;
 	
@@ -32,10 +34,13 @@ public class Listeners extends JPanel implements MouseMotionListener{
 	
 	public Listeners() throws IOException {
 		addMouseMotionListener(this);
-		String path = "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\g.jpg";
+		addKeyListener(this);
+		addMouseListener(this);
 		
-		this.img = ImageEditor.reduceSize(ImageIO.read(new File(path)), 1);
-		this.img_changed = ImageEditor.reduceSize(ImageIO.read(new File(path)), 1);
+		String path = "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\tiger.jpg";
+		
+		this.img = ImageEditor.reduceSize(ImageIO.read(new File(path)), 3);
+		this.img_changed = ImageEditor.reduceSize(ImageIO.read(new File(path)), 3);
 		
 		this.rmin = 256;
 		this.rmax = -1;
@@ -141,6 +146,59 @@ public class Listeners extends JPanel implements MouseMotionListener{
 
 	@Override
 	public void mouseMoved(MouseEvent arg0) {
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if(e.getKeyCode() == KeyEvent.VK_S) {
+			try {
+				ImageEditor.saveImage(this.img_changed, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\img.png");
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		this.requestFocus();
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
