@@ -12,7 +12,7 @@ import javax.imageio.ImageIO;
 public class ImageEditor {
 
 	public static void main(String[] args) throws IOException {
-		BufferedImage img = ImageEditor.loadImage("C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\panda.jpg");
+		BufferedImage img = ImageEditor.loadImage("C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\tiger.jpg");
 		
 		BufferedImage newImg = ImageEditor.reduceSize(img,img.getWidth()/200);
 
@@ -24,6 +24,13 @@ public class ImageEditor {
 		newImg = ImageEditor.contrast(newImg, 40);
 		ImageEditor.toText(newImg, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\img.txt");
 		
+		/*BufferedImage img = ImageEditor.loadImage("C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\tiger.jpg");
+		img = ImageEditor.toBlackAndWhite(img);
+		img = ImageEditor.reduceSize(img,img.getWidth()/200);
+		img = ImageEditor.floydSteinberg(img, 2);
+		
+		ImageEditor.toText(img, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\img.txt");
+		ImageEditor.saveImage(img, "C:\\Users\\Leonardo Capozzi\\Pictures\\ImageTest\\tiger2.png");*/
 	}
 	
 	public static void toText(BufferedImage image, String path) throws IOException {
@@ -203,6 +210,176 @@ public class ImageEditor {
 		}
 		
 		return newImage;
+	}
+	
+	public static BufferedImage floydSteinberg(BufferedImage image, int n) {
+		if(n < 2 || n > 256) {
+			return null;
+		}
+		
+		int w = image.getWidth();
+		int h = image.getHeight();
+
+		BufferedImage newImage = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+		for(int height = 0; height < h; height++) {
+			for(int width = 0; width < w; width++) {
+				newImage.setRGB(width, height, image.getRGB(width, height));
+			}
+		}
+		
+		for(int height = 0; height < h; height++) {
+			for(int width = 0; width < w; width++) {
+				int pixel = newImage.getRGB(width, height);
+				int newPixel = newColor(pixel, n);
+				
+				newImage.setRGB(width, height, newPixel);
+				
+				int alpha = (pixel >> 24) & 0xff;
+				int red = (pixel >> 16) & 0xff;
+				int green = (pixel >> 8) & 0xff;
+				int blue = (pixel) & 0xff;
+				
+				int newAlpha = (newPixel >> 24) & 0xff;
+				int newRed = (newPixel >> 16) & 0xff;
+				int newGreen = (newPixel >> 8) & 0xff;
+				int newBlue = (newPixel) & 0xff;
+				
+				int errAlpha = alpha-newAlpha;
+				int errRed = red-newRed;
+				int errGreen = green-newGreen;
+				int errBlue = blue-newBlue;
+				
+				int otherPixel;
+				int otherAlpha;
+				int otherRed;
+				int otherGreen;
+				int otherBlue;
+
+				//x+1 y
+				if(width+1 < w) {
+					otherPixel = newImage.getRGB(width+1, height);
+
+					otherAlpha = (otherPixel >> 24) & 0xff;
+					otherRed = (otherPixel >> 16) & 0xff;
+					otherGreen = (otherPixel >> 8) & 0xff;
+					otherBlue = (otherPixel) & 0xff;
+
+					otherAlpha += errAlpha * 7 / 16;
+					otherRed += errRed * 7 / 16;
+					otherGreen += errGreen * 7 / 16;
+					otherBlue += errBlue * 7 / 16;
+
+					newImage.setRGB(width+1, height, toPixel(otherAlpha, otherRed, otherGreen, otherBlue));
+				}
+
+				//x-1 y+1
+				if(width-1 >= 0 && height+1 < h) {
+					otherPixel = newImage.getRGB(width-1, height+1);
+
+					otherAlpha = (otherPixel >> 24) & 0xff;
+					otherRed = (otherPixel >> 16) & 0xff;
+					otherGreen = (otherPixel >> 8) & 0xff;
+					otherBlue = (otherPixel) & 0xff;
+
+					otherAlpha += errAlpha * 3 / 16;
+					otherRed += errRed * 3 / 16;
+					otherGreen += errGreen * 3 / 16;
+					otherBlue += errBlue * 3 / 16;
+
+					newImage.setRGB(width-1, height+1, toPixel(otherAlpha, otherRed, otherGreen, otherBlue));
+				}
+				
+				//x y+1
+				if(height+1 < h) {
+					otherPixel = newImage.getRGB(width, height+1);
+
+					otherAlpha = (otherPixel >> 24) & 0xff;
+					otherRed = (otherPixel >> 16) & 0xff;
+					otherGreen = (otherPixel >> 8) & 0xff;
+					otherBlue = (otherPixel) & 0xff;
+
+					otherAlpha += errAlpha * 5 / 16;
+					otherRed += errRed * 5 / 16;
+					otherGreen += errGreen * 5 / 16;
+					otherBlue += errBlue * 5 / 16;
+
+					newImage.setRGB(width, height+1, toPixel(otherAlpha, otherRed, otherGreen, otherBlue));
+				}
+
+				//x+1 y+1
+				if(width+1 < w && height+1 < h) {
+					otherPixel = newImage.getRGB(width+1, height+1);
+
+					otherAlpha = (otherPixel >> 24) & 0xff;
+					otherRed = (otherPixel >> 16) & 0xff;
+					otherGreen = (otherPixel >> 8) & 0xff;
+					otherBlue = (otherPixel) & 0xff;
+
+					otherAlpha += errAlpha * 1 / 16;
+					otherRed += errRed * 1 / 16;
+					otherGreen += errGreen * 1 / 16;
+					otherBlue += errBlue * 1 / 16;
+
+					newImage.setRGB(width+1, height+1, toPixel(otherAlpha, otherRed, otherGreen, otherBlue));
+				}
+			}
+		}
+
+		return newImage;
+	}
+	
+	private static int toPixel(int alpha, int red, int green, int blue) {
+		if(alpha < 0) {
+			alpha = 0;
+		}
+		
+		if(alpha > 255) {
+			alpha = 255;
+		}
+		
+		if(red < 0) {
+			red = 0;
+		}
+		
+		if(red > 255) {
+			red = 255;
+		}
+		
+		if(green < 0) {
+			green = 0;
+		}
+		
+		if(green > 255) {
+			green = 255;
+		}
+		
+		if(blue < 0) {
+			blue = 0;
+		}
+		
+		if(blue > 255) {
+			blue = 255;
+		}
+		
+		return (alpha << 24) | (red << 16) | (green << 8) | blue;
+	}
+	
+	private static int newColor(int pixel, int nColors) {
+		nColors--;
+		
+		int alpha = (pixel >> 24) & 0xff;
+		int red = (pixel >> 16) & 0xff;
+		int green = (pixel >> 8) & 0xff;
+		int blue = (pixel) & 0xff;
+		
+		
+		int newAlpha = (int)((Math.round((nColors*alpha)/255.0)*255.0)/nColors);
+		int newRed = (int)((Math.round((nColors*red)/255.0)*255.0)/nColors);
+		int newGreen = (int)((Math.round((nColors*green)/255.0)*255.0)/nColors);
+		int newBlue = (int)((Math.round((nColors*blue)/255.0)*255.0)/nColors);
+		
+		return toPixel(newAlpha, newRed, newGreen, newBlue);
 	}
 
 }
